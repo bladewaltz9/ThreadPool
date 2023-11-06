@@ -30,18 +30,13 @@ public:
     void init() {
         for (int i = 0; i < m_threads.size(); ++i) {
             m_threads[i] = std::thread(ThreadWorker(this, i));
+            m_threads[i].detach();
         }
     }
 
     void shutdown() {
         m_shutdown = true;
         m_condition.notify_all();  // TODO: 这里通知后，dequeue 会不会有问题？
-
-        for (int i = 0; i < m_threads.size(); ++i) {
-            if (m_threads[i].joinable()) {
-                m_threads[i].join();
-            }
-        }
     }
 
     template <typename F, typename... Args>
